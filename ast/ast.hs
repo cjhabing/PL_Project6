@@ -1,6 +1,5 @@
 module Ast where
 
--- Data structure for arithmetic expressions
 data Expr = Plus Expr Expr 
           | Minus Expr Expr 
           | Times Expr Expr 
@@ -8,15 +7,22 @@ data Expr = Plus Expr Expr
           | Literal Float
           deriving (Show)
 
--- Evaluation function for expressions
 eval :: Expr -> Float
 eval (Literal n) = n
 eval (Plus e1 e2) = eval e1 + eval e2
 eval (Minus e1 e2) = eval e1 - eval e2
 eval (Times e1 e2) = eval e1 * eval e2
-eval (Div e1 e2) = eval e1 / eval e2
+eval (Div e1 e2) = 
+    let denominator = eval e2
+    in if denominator == 0
+       then error "Division by zero error"
+       else eval e1 / denominator
 
--- Test cases
+-- Should eval to "5.0"
 test1 = Plus (Literal 3.0) (Literal 2.0)
+
+-- Should eval to "3.5"
 test2 = Plus (Literal 3.0) (Div (Literal 1.0) (Literal 2.0))
+
+-- Should eval to "15.5"
 test3 = Plus (Times (Literal 3.0) (Literal 5.0)) (Div (Literal 1.0) (Literal 2.0))
